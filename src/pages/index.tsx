@@ -2,9 +2,24 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { LockClosedIcon } from '@heroicons/react/solid';
 import Head from 'next/head';
-import React from 'react';
+import React, { useContext } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function Home() {
+  const { register, handleSubmit } = useForm();
+  const { signIn } = useContext(AuthContext);
+
+  async function handleSignIn(data) {
+    try {
+      await signIn(data);
+    } catch (error) {
+      console.log('Error at handleSignIn:', error);
+      throw new Error();
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Head>
@@ -22,7 +37,7 @@ export default function Home() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleSignIn)}>
           <input type="hidden" name="remember" defaultValue="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -30,6 +45,7 @@ export default function Home() {
                 Email address
               </label>
               <input
+                {...register('email')}
                 id="email-address"
                 name="email"
                 type="email"
@@ -44,6 +60,7 @@ export default function Home() {
                 Password
               </label>
               <input
+                {...register('password')}
                 id="password"
                 name="password"
                 type="password"

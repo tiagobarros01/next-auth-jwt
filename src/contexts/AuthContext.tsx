@@ -5,6 +5,7 @@ import React, {
   createContext, useEffect, useMemo, useState,
 } from 'react';
 
+import { api } from '../services/api';
 import { signRequest, recoverUserInformation } from '../services/auth';
 
 interface User {
@@ -53,6 +54,8 @@ function AuthContextProvider({ children }: Props) {
     setCookie(undefined, 'NextJWT@token', token, {
       maxAge: 60 * 60 * 1, // 1 hour
     });
+
+    api.defaults.headers.Authorization = `Bearer ${token}`;
 
     setUser(user);
 

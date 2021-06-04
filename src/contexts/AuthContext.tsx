@@ -1,9 +1,11 @@
 /* eslint-disable no-shadow */
 import Router from 'next/router';
-import { setCookie } from 'nookies';
-import React, { createContext, useMemo, useState } from 'react';
+import { setCookie, parseCookies } from 'nookies';
+import React, {
+  createContext, useEffect, useMemo, useState,
+} from 'react';
 
-import { signRequest } from '../services/auth';
+import { signRequest, recoverUserInformation } from '../services/auth';
 
 interface User {
   name: string;
@@ -33,13 +35,22 @@ function AuthContextProvider({ children }: Props) {
 
   const isAuthenticated = !!user;
 
+  useEffect(() => {
+    const { 'NextJWT@token': token } = parseCookies();
+
+    if (token) {
+      recoverUserInformation()
+        .then((res) => setUser(res.user));
+    }
+  }, []);
+
   async function signIn({ email, password }: SignInData) {
     const { token, user } = await signRequest({
       email,
       password,
     });
 
-    setCookie(undefined, 'NextJWT@token:', token, {
+    setCookie(undefined, 'NextJWT@token', token, {
       maxAge: 60 * 60 * 1, // 1 hour
     });
 

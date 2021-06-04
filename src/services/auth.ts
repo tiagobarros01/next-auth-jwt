@@ -19,3 +19,16 @@ export async function signRequest(data: signRequestData) {
     },
   };
 }
+
+export async function recoverUserInformation() {
+  await delay();
+
+  return {
+    token: uuid(),
+    user: {
+      name: 'Tiago Barros',
+      email: 'tiago@teste.com',
+      avatar_url: 'https://github.com/tiagobarros01.png',
+    },
+  };
+}

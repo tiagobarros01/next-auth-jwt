@@ -1,11 +1,14 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { parseCookies } from 'nookies';
 import React, { Fragment, useContext, useEffect } from 'react';
 
 import { AuthContext } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { getAPIClient } from '../services/axios';
 
 const navigation = ['Dashboard', 'Team', 'Projects', 'Calendar', 'Reports'];
 const profile = ['Your Profile', 'Settings'];
@@ -18,7 +21,7 @@ export default function Dashboard() {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    api.get('/users');
+    // api.get('/users');
   }, []);
 
   return (
@@ -233,3 +236,23 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const apiClient = getAPIClient(ctx);
+  const { 'NextJWT@token': token } = parseCookies(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  await apiClient.get('users/');
+
+  return {
+    props: {},
+  };
+};
